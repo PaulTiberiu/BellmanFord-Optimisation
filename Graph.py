@@ -1,10 +1,6 @@
 import copy
 import numpy as np
 import random
-import matplotlib.pyplot as plt
-import time
-import math
-from scipy.stats import linregress
 
 #Bellman s'applique que pour un graphe oriente sans cycle negatif!!!
 
@@ -219,9 +215,9 @@ class Graph:
         return s1 + s2
                         
 
-    def random_graph(self, n, p):
+    def random_graph_unary_weight(n, p):
         """
-        Cree un graphe oriente de n sommets sans cycles, où chaque arête (i, j) est présente avec la probabilité p
+        Cree un graphe oriente de n sommets, où chaque arête (i, j) est présente avec la probabilité p et avec un poids unaire
         """
 
         if n < 0:
@@ -234,17 +230,72 @@ class Graph:
         graph = Graph(vertices)
 
         for i in range(n):
-            for j in range(i + 1, n):
-                if random.random() < p and not graph.has_cycle(j, i):
-                    weight = random.randint(-10, 10)  # Ajoute un poids entre -10 et 10
-                    graph.insert_edge(i, j, weight)
+            for j in range(n):
+                if random.random() < p and i != j:
+                    graph.insert_edge(i, j, 1) # Chaque arete a un poids = 1
 
         return graph
+    
+
+    def weighed_graph(self, w):
+        """
+        Crée un nouveau graphe avec des poids entre [-w,w] pour chaque arête
+        """
+
+        new_E = {vertex: set() for vertex in self.V}
+
+        for vertex in self.V:
+            for edge in self.E[vertex]:
+                # Modification du poids de manière aléatoire, excluant le poids 0
+                new_weight = random.randint(-w, w)
+                while new_weight == 0:
+                    new_weight = random.randint(-w, w)
+                
+                new_edge = (edge[0], new_weight)  # Nouvelle paire (sommet, poids)
+                new_E[vertex].add(new_edge)
+
+        # Créer un nouveau graphe avec le nouveau dictionnaire d'arêtes
+        new_graph = Graph(copy.deepcopy(self.V), new_E)
+        
+        return new_graph
+    
+
+    def out_degrees(self):
+        """
+        Calcule le degré sortant de chaque commet dans le graphe
+        Retourne un dictionnaire avec les sommets en tant que clés et leur degré sortant en tant que valeurs
+        """
+        degrees = {vertex: 0 for vertex in self.V}
+
+        for vertex in self.V:
+            for _, _ in self.E[vertex]:
+                degrees[vertex] += 1
+
+        return degrees
+    
+
+    def node_with_high_out_degree(self):
+        """
+        Renvoie un sommet avec un degré sortant supérieur à |V|/2
+        Si aucun sommet ne satisfait cette condition, renvoie None
+        """
+
+        out_degrees = self.out_degrees()
+        threshold = len(self.V) / 2
+
+        for vertex, out_degree in out_degrees.items():
+            if out_degree > threshold:
+                return vertex
+
+        return None
 
 
 #nb d'iterations qu'il prend, pour chaque sommet, de determiner le plus court chemin => stocker ca dans une liste
 #a faire en fonction de l'algo glouton et l'ordre et a comparer avec belman classique comme premier test
 #a faire une fonction qui va tracer un graphe en fonction du nombre d'iterations pour trouver le plus court chemin (en fonction des sauts(cb de sauts il doit faire))
+#ordre aleatoire test bellman
+#ordre glouton test bellman    a essayer plusieurs fois pour voir si le nb d'iterations differe
+
     def bellmanFord(self, start):
         """
         Retourne les distances et les chemins des plus court chemins de start vers les sommets du graph
@@ -273,7 +324,7 @@ class Graph:
             for v, w in self.E[y]:
                 if distances[v] > distances[y] + w:
                     print("Cycle negatif")
-                    return
+                    return 0, 0, 0
 
                 
         paths = {}
