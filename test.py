@@ -1,7 +1,8 @@
 import Graph
+import copy
 
 def test():
-    print("-START-")
+    print("---START---\n")
 
     def q1():
         vertices = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -28,8 +29,6 @@ def test():
         print("Le nombre d'iterations: ", iter)
         print("")
 
-    # QUESTION2
-
     def q2():
         vertices = [1, 2, 3, 4, 5, 6, 7, 8]
         adjacents = {1 : {(2, 3), (3, 2)}, 2 : {(3, 5)}, 3: {(4, 7)}, 4 : {(5, 1), (6, 4), (7, 2)}, 5 : {(7, 2)}, 6 : {(5, 2), (8, 5)}, 7 : {(1, 2)}, 8 : {(3, 4), (2, 3)}}
@@ -37,9 +36,6 @@ def test():
         s = Graph.Graph.glouton_fas(graph)
         print(s)
         print("")
-    
-
-    # QUESTION 3
 
     def q3():
         graph_rand = Graph.Graph.random_graph_unary_weight(5, 0.45)
@@ -88,7 +84,8 @@ def test():
     
     def q4():
         graphs, deg = q3()
-        graphs.pop(3)
+        graphs_cpy = copy.deepcopy(graphs)
+        graphs_cpy.pop(3)
         i = 0
         list_path = []
         for g in graphs:
@@ -114,13 +111,31 @@ def test():
 
         glouton_T = Graph.Graph.glouton_fas(graph_T)
 
-        print("\nGloutonFas avec comme entree T: ", glouton_T)
+        print("GloutonFas avec comme entree T: ", glouton_T, "\n")
         return graphs, deg, T, glouton_T
     
-    # def q6():
+    def q6():
+        graphs, deg, T, glouton_T = q5()
 
+        print("Rappel Graphe H:")
+        print("Sommets:", graphs[3].V)
+        print("Arcs:", graphs[3].E, "\n")
 
-    q4()
+        bg, arbre, iter = Graph.Graph.bellmanFord_gloutonFas(graphs[3], glouton_T)
+        print(f"Bellman-Ford sur graph H avec ordre <tot :\nAlgorithme en partant de {glouton_T[0]}: {bg}\nArbre des plus courts chemins en partant de {glouton_T[0]}: {arbre}\nNombre d'iterations: {iter}\n")
+        
+        return graphs
+
+    def q7():
+        graphs = q6()
+
+        ordre_aleatoire = Graph.Graph.random_order(graphs[3])
+        print("Ordre aleatoire: ", ordre_aleatoire, "\n")
+
+        bg, arbre, iter = Graph.Graph.bellmanFord_gloutonFas(graphs[3], ordre_aleatoire)
+        print(f"Bellman-Ford sur graph H avec ordre aleatoire :\nAlgorithme en partant de {ordre_aleatoire[0]}: {bg}\nArbre des plus courts chemins en partant de {ordre_aleatoire[0]}: {arbre}\nNombre d'iterations: {iter}\n")
+
+    q7()
 
 
 if __name__ == '__main__':

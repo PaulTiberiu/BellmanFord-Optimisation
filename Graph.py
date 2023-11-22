@@ -297,15 +297,13 @@ class Graph:
         """
 
         order = []
-        i = 0
 
         for vertex in self.V:
-            order[i] = vertex
-            i += 1
+            order.append(vertex)
 
-        new_order = []
+        new_order = np.zeros_like(order)
         for i in range (len(order)):
-            new_position = random.randint(0, len(order))
+            new_position = random.randint(0, len(order) - 1)
 
             if order[i] not in new_order:
                 new_order[new_position] = order[i]
@@ -313,7 +311,7 @@ class Graph:
         return new_order
     
 
-    def union_path(list_path): # C'EST CA CE QU'IL FAUT FAIRE? NON. A MODIF
+    def union_path(list_path):
         """
         Renvoie l'union des arborescences des plus courts chemins
         """
@@ -322,9 +320,8 @@ class Graph:
         
         for dico in list_path:
             for vertex, path in dico.items():
-                for v in path:
-                    if v not in T[vertex]:
-                        T[vertex].append(v)
+                if path not in T[vertex]:
+                    T[vertex].append(path)
 
         return T
     
@@ -336,17 +333,20 @@ class Graph:
 
         graph = Graph(set(T.keys()))  # Création d'un graphe avec les sommets de T
 
-        for _, path in T.items():
-            if len(path) > 1:
-                for i in range(len(path) - 1):
-                    v1, v2 = path[i], path[i + 1]
+        already_in = []
 
-                    # Vérifie si l'arête n'est pas déjà présente avant de l'ajouter
-                    if v2 not in {u for u, _ in graph.E.get(v1, set())}:
-                        # Ajout d'une arête entre les sommets successifs dans le chemin avec un poids de 1
-                        graph.insert_edge(v1, v2, 1)
+        for _, paths in T.items():
+            for path in paths:
+                if len(path) > 1:
+                    for i in range(len(path) - 1):
+                        v1, v2 = path[i], path[i + 1]
+                        if v1 != None and (v1,v2) not in already_in:
+                            # Ajout d'une arête entre les sommets successifs dans le chemin avec un poids de 1
+                            graph.insert_edge(v1, v2, 1)
+                            already_in.append((v1,v2))
 
         return graph
+    
 
 #nb d'iterations qu'il prend, pour chaque sommet, de determiner le plus court chemin => stocker ca dans une liste
 #a faire en fonction de l'algo glouton et l'ordre et a comparer avec belman classique comme premier test
@@ -398,11 +398,11 @@ class Graph:
         return distances, paths, iterations
     
 
-    def bellmanFord_gloutonFas(self, start, ordre):
+    def bellmanFord_gloutonFas(self, ordre):
         """
         Retourne les distances et les chemins des plus court chemins de start vers les sommets du graph
         """
-
+        start = ordre[0]
         distances = {}
         predecesseurs = {}
         
@@ -434,7 +434,7 @@ class Graph:
         for p in predecesseurs: # On regarde le chemin pour chaque sommet du graph
             path = []
             a = p
-            while p != start: # Tant qu'on arrive pas au sommet de depart
+            while p != start and p != None: # Tant qu'on arrive pas au sommet de depart
                 path.append(p) # On ajoute le sommet au chemin
                 p = predecesseurs[p] # Puis on passe a son predecesseur
             path.append(p)
