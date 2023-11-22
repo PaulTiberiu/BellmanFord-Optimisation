@@ -209,8 +209,8 @@ class Graph:
                 s1.append(u_max_delta)
                 G_cpy.V.remove(u_max_delta)
 
-        print("s1: ", s1)
-        print("s2: ", s2)
+        # print("s1: ", s1)
+        # print("s2: ", s2)
 
         return s1 + s2
                         
@@ -265,6 +265,7 @@ class Graph:
         Calcule le degré sortant de chaque commet dans le graphe
         Retourne un dictionnaire avec les sommets en tant que clés et leur degré sortant en tant que valeurs
         """
+        
         degrees = {vertex: 0 for vertex in self.V}
 
         for vertex in self.V:
@@ -288,7 +289,64 @@ class Graph:
                 return vertex
 
         return None
+    
 
+    def random_order(self): # Utilise pour la question 7
+        """
+        Renvoie un ordre aleatoire de sommets du graphe
+        """
+
+        order = []
+        i = 0
+
+        for vertex in self.V:
+            order[i] = vertex
+            i += 1
+
+        new_order = []
+        for i in range (len(order)):
+            new_position = random.randint(0, len(order))
+
+            if order[i] not in new_order:
+                new_order[new_position] = order[i]
+
+        return new_order
+    
+
+    def union_path(list_path): # C'EST CA CE QU'IL FAUT FAIRE? NON. A MODIF
+        """
+        Renvoie l'union des arborescences des plus courts chemins
+        """
+
+        T = {i : [] for i in list_path[0]}
+        
+        for dico in list_path:
+            for vertex, path in dico.items():
+                for v in path:
+                    if v not in T[vertex]:
+                        T[vertex].append(v)
+
+        return T
+    
+    
+    def from_tree_to_graph(T): # A TESTER EGALEMENT
+        """
+        Renvoie un graphe pondere unaire a partir de l'arborescence T
+        """
+
+        graph = Graph(set(T.keys()))  # Création d'un graphe avec les sommets de T
+
+        for _, path in T.items():
+            if len(path) > 1:
+                for i in range(len(path) - 1):
+                    v1, v2 = path[i], path[i + 1]
+
+                    # Vérifie si l'arête n'est pas déjà présente avant de l'ajouter
+                    if v2 not in {u for u, _ in graph.E.get(v1, set())}:
+                        # Ajout d'une arête entre les sommets successifs dans le chemin avec un poids de 1
+                        graph.insert_edge(v1, v2, 1)
+
+        return graph
 
 #nb d'iterations qu'il prend, pour chaque sommet, de determiner le plus court chemin => stocker ca dans une liste
 #a faire en fonction de l'algo glouton et l'ordre et a comparer avec belman classique comme premier test
@@ -305,14 +363,14 @@ class Graph:
         predecesseurs = {}
         
         for v in self.V:
-            distances[v] = np.inf       # On fixe dv = infini
+            distances[v] = np.inf # On fixe dv = infini
             predecesseurs[v] = None
         distances[start] = 0
 
         iterations = 0
 
-        for _ in range(len(self.V) - 1):                    # On itere sur tous les sommets
-            for y in self.E:                                # On verifie chaque arcs entrants
+        for _ in range(len(self.V) - 1): # On itere sur tous les sommets
+            for y in self.E: # On verifie chaque arc entrant
                 for v, w in self.E[y]:
                     if distances[y] + w < distances[v]:
                         distances[v] = distances[y] + w
@@ -328,19 +386,19 @@ class Graph:
 
                 
         paths = {}
-        for p in predecesseurs:         # On regarde le chemin pour chaque sommet du graph
+        for p in predecesseurs: # On regarde le chemin pour chaque sommet du graph
             path = []
             a = p
-            while p != start:           # Tant qu'on arrive pas au sommet de depart:
-                path.append(p)          # On ajoute le sommet au chemin
-                p = predecesseurs[p]    # Puis on passe a son predecesseur
+            while p != start and p != None: # Tant qu'on arrive pas au sommet de depart
+                path.append(p) # On ajoute le sommet au chemin
+                p = predecesseurs[p] # Puis on passe a son predecesseur
             path.append(p)
-            paths[a] = path[::-1]       # On retourne la liste
+            paths[a] = path[::-1] # On retourne la liste
 
         return distances, paths, iterations
     
 
-    def bellmanFordMVP(self, start):
+    def bellmanFord_gloutonFas(self, start, ordre):
         """
         Retourne les distances et les chemins des plus court chemins de start vers les sommets du graph
         """
@@ -349,17 +407,15 @@ class Graph:
         predecesseurs = {}
         
         for v in self.V:
-            distances[v] = np.inf       # On fixe dv = infini
+            distances[v] = np.inf # On fixe dv = infini
             predecesseurs[v] = None
         distances[start] = 0
 
         iterations = 0
 
-        ordre = self.glouton_fas()
-
-        for _ in range(len(self.V) - 1):                    # On itere sur tous les sommets
+        for _ in range(len(self.V) - 1): # On itere sur tous les sommets
             for y in ordre:
-                if y in self.E:                                # On verifie chaque arcs entrants
+                if y in self.E: # On verifie chaque arcs entrants
                     for v, w in self.E[y]:
                         if distances[y] + w < distances[v]:
                             distances[v] = distances[y] + w
@@ -371,17 +427,17 @@ class Graph:
             for v, w in self.E[y]:
                 if distances[v] > distances[y] + w:
                     print("Cycle negatif")
-                    return
+                    return 0, 0, 0
 
                 
         paths = {}
-        for p in predecesseurs:         # On regarde le chemin pour chaque sommet du graph
+        for p in predecesseurs: # On regarde le chemin pour chaque sommet du graph
             path = []
             a = p
-            while p != start:           # Tant qu'on arrive pas au sommet de depart:
-                path.append(p)          # On ajoute le sommet au chemin
-                p = predecesseurs[p]    # Puis on passe a son predecesseur
+            while p != start: # Tant qu'on arrive pas au sommet de depart
+                path.append(p) # On ajoute le sommet au chemin
+                p = predecesseurs[p] # Puis on passe a son predecesseur
             path.append(p)
-            paths[a] = path[::-1]       # On retourne la liste
+            paths[a] = path[::-1] # On retourne la liste
 
         return distances, paths, iterations
