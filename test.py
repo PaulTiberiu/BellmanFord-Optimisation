@@ -1,7 +1,8 @@
 import Graph
 import copy
+import sys
 
-def test():
+def test(question):
     print("---START---\n")
 
     def q1():
@@ -45,7 +46,7 @@ def test():
         
         if deg == None:
             print("Pas de sommet avec un degree sortant > |V|/2 !")
-            test()
+            test(question)
             exit()
         
         print("Graphe random: ")
@@ -68,7 +69,7 @@ def test():
             i+=1
             bg, arbre, iter = Graph.Graph.bellmanFord(g, deg)
             if bg == 0 and arbre == 0 and iter == 0:            #Cycle negatif
-                test()
+                test(question)
                 exit()
         
             if i == 4:
@@ -91,7 +92,11 @@ def test():
         for g in graphs:
             i+=1
             bg, arbre, iter = Graph.Graph.bellmanFord(g, deg)
-            print(f"Bellman-Ford sur graph {i}:\nAlgorithme en partant de {deg}: {bg}\nArbre des plus courts chemins en partant de {deg}: {arbre}\nNombre d'iterations: {iter}\n")
+            if i == 4:
+                print(f"Bellman-Ford sur graph H (tests): ")
+            else:
+                print(f"Bellman-Ford sur graph w{i}: ")
+            print(f"Algorithme en partant de {deg}: {bg}\nArbre des plus courts chemins en partant de {deg}: {arbre}\nNombre d'iterations: {iter}\n")
             list_path.append(arbre)
 
         T = Graph.Graph.union_path(list_path)
@@ -121,22 +126,37 @@ def test():
         print("Sommets:", graphs[3].V)
         print("Arcs:", graphs[3].E, "\n")
 
-        bg, arbre, iter = Graph.Graph.bellmanFord_gloutonFas(graphs[3], glouton_T)
-        print(f"Bellman-Ford sur graph H avec ordre <tot :\nAlgorithme en partant de {glouton_T[0]}: {bg}\nArbre des plus courts chemins en partant de {glouton_T[0]}: {arbre}\nNombre d'iterations: {iter}\n")
+        bg, arbre, iter = Graph.Graph.bellmanFord_gloutonFas(graphs[3], deg, glouton_T)
+        print(f"Bellman-Ford sur graph H avec ordre <tot :\nAlgorithme en partant de {deg}: {bg}\nArbre des plus courts chemins en partant de {deg}: {arbre}\nNombre d'iterations: {iter}\n")
         
-        return graphs
+        return graphs, deg
 
     def q7():
-        graphs = q6()
+        graphs, deg = q6()
 
         ordre_aleatoire = Graph.Graph.random_order(graphs[3])
         print("Ordre aleatoire: ", ordre_aleatoire, "\n")
 
-        bg, arbre, iter = Graph.Graph.bellmanFord_gloutonFas(graphs[3], ordre_aleatoire)
-        print(f"Bellman-Ford sur graph H avec ordre aleatoire :\nAlgorithme en partant de {ordre_aleatoire[0]}: {bg}\nArbre des plus courts chemins en partant de {ordre_aleatoire[0]}: {arbre}\nNombre d'iterations: {iter}\n")
+        bg, arbre, iter = Graph.Graph.bellmanFord_gloutonFas(graphs[3], deg, ordre_aleatoire)
+        print(f"Bellman-Ford sur graph H avec ordre aleatoire :\nAlgorithme en partant de {deg}: {bg}\nArbre des plus courts chemins en partant de {deg}: {arbre}\nNombre d'iterations: {iter}\n")
 
-    q7()
-
+    if question == "1":
+        q1()
+    elif question == "2":
+        q2()
+    elif question == "3":
+        q3()
+    elif question == "4":
+        q4()
+    elif question == "5":
+        q5()
+    elif question == "6":
+        q6()
+    elif question == "7":
+        q7()
 
 if __name__ == '__main__':
-    test()
+    if len(sys.argv) != 2 or int(sys.argv[1]) > 7 or int(sys.argv[1]) < 1:
+        raise ValueError("Il faut indiquer le numero de la question en argument de la ligne de commande (de 1 à 7)")
+
+    test(sys.argv[1])       # Indiquer le numero de la question en argument de la ligne de commande

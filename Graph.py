@@ -1,9 +1,9 @@
 import copy
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 #Bellman s'applique que pour un graphe oriente sans cycle negatif!!!
-#test
 
 class Graph:
     V = set # Ensemble de sommets (la liste de sommets) 
@@ -292,7 +292,7 @@ class Graph:
         return None
     
 
-    def random_order(self): # Utilise pour la question 7
+    def random_order(self):
         """
         Renvoie un ordre aleatoire de sommets du graphe
         """
@@ -302,14 +302,9 @@ class Graph:
         for vertex in self.V:
             order.append(vertex)
 
-        new_order = np.zeros_like(order)
-        for i in range (len(order)):
-            new_position = random.randint(0, len(order) - 1)
+        random.shuffle(order)
 
-            if order[i] not in new_order:
-                new_order[new_position] = order[i]
-
-        return new_order
+        return order
     
 
     def union_path(list_path):
@@ -327,7 +322,7 @@ class Graph:
         return T
     
     
-    def from_tree_to_graph(T): # A TESTER EGALEMENT
+    def from_tree_to_graph(T):
         """
         Renvoie un graphe pondere unaire a partir de l'arborescence T
         """
@@ -379,7 +374,7 @@ class Graph:
                         predecesseurs[v] = y
                         converged = False
             if converged:
-                break;
+                break
 
         # On verifie qu'il n'y a pas de Cycle negatif
         for y in self.E:
@@ -402,11 +397,11 @@ class Graph:
         return distances, paths, iteration+1
     
 
-    def bellmanFord_gloutonFas(self, ordre):
+    def bellmanFord_gloutonFas(self, start, ordre):
         """
         Retourne les distances et les chemins des plus court chemins de start vers les sommets du graph
         """
-        start = ordre[0]
+
         distances = {}
         predecesseurs = {}
         
@@ -425,7 +420,7 @@ class Graph:
                             predecesseurs[v] = y
                             converged = False
             if converged:
-                break;
+                break
 
         # On verifie qu'il n'y a pas de Cycle negatif
         for y in self.E:
@@ -446,3 +441,78 @@ class Graph:
             paths[a] = path[::-1] # On retourne la liste
 
         return distances, paths, iteration+1
+    
+
+    def analyze_vertex_iteration_nb(num_graphs_per_size, Nmax, p, Nweight, weight_interval):
+        """
+        Fonction qui trace un graphe avec en abscisse le nombre d'iterations
+        et en ordonne le nombre des sommets pour un nombre fixe des graphes de test
+        """
+
+        vertex_number = []
+        iteration_number = []
+
+        if (Nmax <= 3):
+            raise ValueError("Le parametre Nmax doit etre superieur a 3 pour avoir des tests pertinents")
+
+        for n in range(4, Nmax + 1):
+
+            for _ in range(num_graphs_per_size):
+                graph = Graph.random_graph_unary_weight(n, p)
+                
+                list_graph_w = []
+                for _ in range (Nweight): # Creation des graphes ponderees
+                    weight = random.randint(weight_interval)
+                    list_graph_w.append(Graph.weighed_graph(graph, weight))
+                    # a continuer
+                
+                
+                    
+                """
+                cover = graph.branch_simple()
+                cover = graph.branch_and_bound()
+                cover = graph.improved_branch_and_bound()
+                cover = graph.improved_branch_and_bound_degmax()
+                """
+
+            """
+            average_execution_time = total_execution_time / num_graphs_per_size
+            execution_times.append(average_execution_time)
+            """
+
+
+        # Tracé du temps d'exécution en fonction de la taille du graphe (n)
+        plt.plot(range(1, Nmax + 1), execution_times, marker='o')
+        plt.xlabel("Taille du graphe (n)")
+        plt.ylabel("Temps d'exécution moyen (secondes)")
+        plt.title("Temps d'exécution moyen du Branchement en fonction de la taille du graphe")
+        plt.show()
+
+        # Tracé du log de temps d'exécution en fonction de la taille du graphe (n)
+        plt.plot(range(1, Nmax + 1), (execution_times), marker='o')
+        plt.xlabel("Taille du graphe (n)")
+        plt.ylabel("Log Temps d'exécution moyen (secondes)")
+        plt.yscale("log")
+        plt.title("Log du Temps d'exécution moyen du Branchement en fonction de la taille du graphe")
+        plt.show()
+
+        # Tracé du log de temps d'exécution en fonction de la taille du graphe (n)
+        plt.plot(range(1, Nmax + 1), (execution_times), marker='o')
+        plt.xlabel("Log Taille du graphe (n)")
+        plt.ylabel("Log Temps d'exécution moyen (secondes)")
+        plt.yscale("log")
+        plt.xscale("log")
+        plt.title("Log du Temps d'exécution moyen du Branchement en fonction du log taille du graphe")
+        plt.show()
+
+        # Tracé du log de temps d'exécution en fonction de la taille du graphe (n)
+        plt.plot(range(1, Nmax + 1), (execution_times), marker='o')
+        plt.xlabel("Log Taille du graphe (n)")
+        plt.ylabel("Temps d'exécution moyen (secondes)")
+        plt.xscale("log")
+        plt.title("Temps d'exécution moyen du Branchement en fonction du log taille du graphe")
+        plt.show()
+
+
+
+    
