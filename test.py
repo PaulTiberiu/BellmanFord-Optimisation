@@ -41,7 +41,6 @@ def test(question):
     def q3():
         graph_rand = Graph.Graph.random_graph_unary_weight(5, 0.45)
     
-        dico = Graph.Graph.out_degrees(graph_rand)
         deg = Graph.Graph.node_with_high_out_degree(graph_rand)
         
         if deg == None:
@@ -140,6 +139,9 @@ def test(question):
         bg, arbre, iter = Graph.Graph.bellmanFord_gloutonFas(graphs[3], deg, ordre_aleatoire)
         print(f"Bellman-Ford sur graph H avec ordre aleatoire :\nAlgorithme en partant de {deg}: {bg}\nArbre des plus courts chemins en partant de {deg}: {arbre}\nNombre d'iterations: {iter}\n")
 
+    def q9():
+        Graph.Graph.analyze_vertex_iteration_nb(3, 10, 0.3, 2, 10)
+
     if question == "1":
         q1()
     elif question == "2":
@@ -154,9 +156,13 @@ def test(question):
         q6()
     elif question == "7":
         q7()
+    elif question == "8":
+        print("Le nombre d'iteration de l'algorithme Bellman-Ford est plus bas lorsque l'ordre donné par l'algorithme GloutonFas est utilise compare a un ordre aleatoire.")
+    elif question == "9":
+        q9()
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2 or int(sys.argv[1]) > 7 or int(sys.argv[1]) < 1:
+    if len(sys.argv) != 2 or int(sys.argv[1]) > 9 or int(sys.argv[1]) < 1:
         raise ValueError("Il faut indiquer le numero de la question en argument de la ligne de commande (de 1 à 7)")
 
     test(sys.argv[1])       # Indiquer le numero de la question en argument de la ligne de commande
