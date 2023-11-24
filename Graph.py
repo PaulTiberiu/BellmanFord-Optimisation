@@ -3,6 +3,7 @@ import numpy as np
 import random
 
 #Bellman s'applique que pour un graphe oriente sans cycle negatif!!!
+#test
 
 class Graph:
     V = set # Ensemble de sommets (la liste de sommets) 
