@@ -367,15 +367,18 @@ class Graph:
             predecesseurs[v] = None
         distances[start] = 0
 
-        iterations = 0
+        # iterations = 0
 
-        for _ in range(len(self.V) - 1): # On itere sur tous les sommets
+        for iteration in range(len(self.V) - 1): # On itere sur tous les sommets
+            converged = True
             for y in self.E: # On verifie chaque arc entrant
                 for v, w in self.E[y]:
                     if distances[y] + w < distances[v]:
                         distances[v] = distances[y] + w
                         predecesseurs[v] = y
-            iterations += 1
+                        converged = False
+            if converged:
+                break;
 
         # On verifie qu'il n'y a pas de Cycle negatif
         for y in self.E:
@@ -395,7 +398,7 @@ class Graph:
             path.append(p)
             paths[a] = path[::-1] # On retourne la liste
 
-        return distances, paths, iterations
+        return distances, paths, iteration+1
     
 
     def bellmanFord_gloutonFas(self, ordre):
@@ -411,16 +414,17 @@ class Graph:
             predecesseurs[v] = None
         distances[start] = 0
 
-        iterations = 0
-
-        for _ in range(len(self.V) - 1): # On itere sur tous les sommets
+        for iteration in range(len(self.V) - 1): # On itere sur tous les sommets
+            converged = True
             for y in ordre:
                 if y in self.E: # On verifie chaque arcs entrants
                     for v, w in self.E[y]:
                         if distances[y] + w < distances[v]:
                             distances[v] = distances[y] + w
                             predecesseurs[v] = y
-            iterations += 1
+                            converged = False
+            if converged:
+                break;
 
         # On verifie qu'il n'y a pas de Cycle negatif
         for y in self.E:
@@ -440,4 +444,4 @@ class Graph:
             path.append(p)
             paths[a] = path[::-1] # On retourne la liste
 
-        return distances, paths, iterations
+        return distances, paths, iteration+1

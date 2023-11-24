@@ -61,7 +61,6 @@ def test():
         H = Graph.Graph.weighed_graph(graph_rand, 12)
 
         graphs = [graph_rand_w1, graph_rand_w2, graph_rand_w3, H]
-        # weights = [3, 6, 9, 12]
 
         i = 0
 
@@ -76,6 +75,7 @@ def test():
                 print(f"Graphe random H (tests): ")
             else:
                 print(f"Graphe random w{i}: ")
+                
             print("Sommets:", g.V)
             print("Arcs:", g.E)
             print("")
