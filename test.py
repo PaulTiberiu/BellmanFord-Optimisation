@@ -42,9 +42,9 @@ def test(question):
         bool = True
         while bool:
             bool = False
-            graph_rand = Graph.Graph.random_graph_unary_weight(7, 0.45)
+            graph_rand = Graph.Graph.random_graph_unary_weight(7, 0.25)
     
-            deg = Graph.Graph.node_with_high_out_degree(graph_rand)
+            deg = Graph.Graph.can_reach_half(graph_rand)
         
             if deg == None:
                 bool = True
@@ -55,7 +55,7 @@ def test(question):
             print("Arcs:", graph_rand.E)
             print("")
 
-            print("Sommet avec degree sortant > |V|/2: ", deg, "\n")
+            print("Sommet qui peut atteindre au moins |V|/2: ", deg, "\n")
 
             graph_rand_w1 = Graph.Graph.weighed_graph(graph_rand, 3)
             graph_rand_w2 = Graph.Graph.weighed_graph(graph_rand, 6)
@@ -71,7 +71,7 @@ def test(question):
                 bg, arbre, iter = Graph.Graph.bellmanFord(g, deg)
                 if bg == 0 and arbre == 0 and iter == 0:            #Cycle negatif
                     bool = True
-                    continue
+                    break
             
                 if i == 4:
                     print(f"Graphe random H (tests): ")

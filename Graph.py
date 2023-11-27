@@ -276,7 +276,7 @@ class Graph:
         return degrees
     
 
-    def node_with_high_out_degree(self):
+    def node_with_high_out_degree(self):    # A MODIFIER ET REGRDER DANS LE RAPPORT
         """
         Renvoie un sommet avec un degré sortant supérieur à |V|/2
         Si aucun sommet ne satisfait cette condition, renvoie None
@@ -291,6 +291,30 @@ class Graph:
 
         return None
     
+    def can_reach_half(self):    # A MODIFIER ET REGRDER DANS LE RAPPORT
+        """
+        Renvoie un sommet avec un degré sortant supérieur à |V|/2
+        Si aucun sommet ne satisfait cette condition, renvoie None
+        """
+        threshold = len(self.V) // 2
+
+        def recursive_count(self, vertex, visited, count):
+            visited.add(vertex)
+
+            for neighbor, _ in self.E[vertex]:
+                if neighbor not in visited:
+                    count = recursive_count(self, neighbor, visited, count + 1)
+
+            return count
+
+        for source in self.V:
+            visited = set()
+            reachable_count = recursive_count(self, source, visited, 0)
+
+            if reachable_count >= threshold:
+                return source
+
+        return None
 
     def random_order(self):
         """
@@ -483,7 +507,7 @@ class Graph:
                             list_graph_w.append(graph_test_H)
                             break
 
-                    deg = Graph.node_with_high_out_degree(graph)
+                    deg = Graph.can_reach_half(graph)
 
                     if deg == None:
                         bool = True #recommencer
@@ -567,14 +591,14 @@ class Graph:
         graph = Graph(V, E)
         return graph
     
-    def pretraitement_methode(graph, nb_g, weight_interval):
+    def pretraitement_methode(self, nb_g, weight_interval):
         """
         Fonction qui trace un graphe avec en abscisse le nombre d'iterations
         et en ordonne le nombre des sommets pour un nombre fixe des graphes de test
         """        
         bool = True
 
-        if (len(graph.V) <= 3):
+        if (len(self.V) <= 3):
             raise ValueError("Le parametre Nmax doit etre superieur a 3 pour avoir des tests pertinents")
         
         bool = True
@@ -588,18 +612,18 @@ class Graph:
                 while True:
                     weight = random.randint(1, weight_interval)
                     if weight not in (list_weights):
-                        list_graph_w.append(Graph.weighed_graph(graph, weight))
+                        list_graph_w.append(Graph.weighed_graph(self, weight))
                         list_weights.append(weight)
                         break
 
             while True:
                 weight = random.randint(1, weight_interval)
                 if weight not in (list_weights):
-                    graph_test_H = Graph.weighed_graph(graph, weight)
+                    graph_test_H = Graph.weighed_graph(self, weight)
                     list_graph_w.append(graph_test_H)
                     break
 
-            deg = Graph.node_with_high_out_degree(graph)                # ???????????????????????????????????????????????????????????????????????? demander prof 
+            deg = Graph.can_reach_half(self)
 
             if deg == None:
                 bool = True #recommencer
