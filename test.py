@@ -143,6 +143,10 @@ def test(question):
 
     def q9():
         Graph.Graph.analyze_vertex_iteration_nb(3, 10, 0.3, 2, 10)
+    
+    def q11():
+        g = Graph.Graph.create_graph_by_level(4, 5, 10)
+        Graph.Graph.pretraitement_methode(g, 3, 10)
 
     if question == "1":
         q1()
@@ -162,9 +166,13 @@ def test(question):
         print("Le nombre d'iteration de l'algorithme Bellman-Ford est plus bas lorsque l'ordre donné par l'algorithme GloutonFas est utilise compare a un ordre aleatoire.")
     elif question == "9":
         q9()
+    elif question == "10":
+        print("")
+    elif question == "11":
+        q11()
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2 or int(sys.argv[1]) > 9 or int(sys.argv[1]) < 1:
-        raise ValueError("Il faut indiquer le numero de la question en argument de la ligne de commande (de 1 à 7)")
+    if len(sys.argv) != 2 or int(sys.argv[1]) > 11 or int(sys.argv[1]) < 1:
+        raise ValueError("Il faut indiquer le numero de la question en argument de la ligne de commande (de 1 à 11)")
 
     test(sys.argv[1])       # Indiquer le numero de la question en argument de la ligne de commande
