@@ -39,46 +39,48 @@ def test(question):
         print("")
 
     def q3():
-        graph_rand = Graph.Graph.random_graph_unary_weight(5, 0.45)
+        bool = True
+        while bool:
+            bool = False
+            graph_rand = Graph.Graph.random_graph_unary_weight(7, 0.45)
     
-        deg = Graph.Graph.node_with_high_out_degree(graph_rand)
+            deg = Graph.Graph.node_with_high_out_degree(graph_rand)
         
-        if deg == None:
-            print("Pas de sommet avec un degree sortant > |V|/2 !")
-            test(question)
-            exit()
+            if deg == None:
+                bool = True
+                continue
         
-        print("Graphe random: ")
-        print("Sommets:", graph_rand.V)
-        print("Arcs:", graph_rand.E)
-        print("")
-
-        print("Sommet avec degree sortant > |V|/2: ", deg, "\n")
-
-        graph_rand_w1 = Graph.Graph.weighed_graph(graph_rand, 3)
-        graph_rand_w2 = Graph.Graph.weighed_graph(graph_rand, 6)
-        graph_rand_w3 = Graph.Graph.weighed_graph(graph_rand, 9)
-        H = Graph.Graph.weighed_graph(graph_rand, 12)
-
-        graphs = [graph_rand_w1, graph_rand_w2, graph_rand_w3, H]
-
-        i = 0
-
-        for g in graphs:
-            i+=1
-            bg, arbre, iter = Graph.Graph.bellmanFord(g, deg)
-            if bg == 0 and arbre == 0 and iter == 0:            #Cycle negatif
-                test(question)
-                exit()
-        
-            if i == 4:
-                print(f"Graphe random H (tests): ")
-            else:
-                print(f"Graphe random w{i}: ")
-                
-            print("Sommets:", g.V)
-            print("Arcs:", g.E)
+            print("Graphe random: ")
+            print("Sommets:", graph_rand.V)
+            print("Arcs:", graph_rand.E)
             print("")
+
+            print("Sommet avec degree sortant > |V|/2: ", deg, "\n")
+
+            graph_rand_w1 = Graph.Graph.weighed_graph(graph_rand, 3)
+            graph_rand_w2 = Graph.Graph.weighed_graph(graph_rand, 6)
+            graph_rand_w3 = Graph.Graph.weighed_graph(graph_rand, 9)
+            H = Graph.Graph.weighed_graph(graph_rand, 12)
+
+            graphs = [graph_rand_w1, graph_rand_w2, graph_rand_w3, H]
+
+            i = 0
+
+            for g in graphs:
+                i+=1
+                bg, arbre, iter = Graph.Graph.bellmanFord(g, deg)
+                if bg == 0 and arbre == 0 and iter == 0:            #Cycle negatif
+                    bool = True
+                    continue
+            
+                if i == 4:
+                    print(f"Graphe random H (tests): ")
+                else:
+                    print(f"Graphe random w{i}: ")
+                    
+                print("Sommets:", g.V)
+                print("Arcs:", g.E)
+                print("")
             
         return graphs, deg
     
