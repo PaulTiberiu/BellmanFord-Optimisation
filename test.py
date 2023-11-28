@@ -42,7 +42,7 @@ def test(question):
         bool = True
         while bool:
             bool = False
-            graph_rand = Graph.Graph.random_graph_unary_weight(7, 0.25)
+            graph_rand = Graph.Graph.random_graph_unary_weight(5, 0.3)
     
             deg = Graph.Graph.can_reach_half(graph_rand)
         
@@ -143,6 +143,10 @@ def test(question):
 
     def q9():
         Graph.Graph.analyze_vertex_iteration_nb(3, 10, 0.3, 2, 10)
+
+    def q10():
+        #Graph.Graph.analyze_vertex_iteration_nb_different_nb_g(3, 10, 0.3, [2, 6], 10)
+        print("")
     
     def q11():
         g = Graph.Graph.create_graph_by_level(4, 5, 10)
@@ -167,7 +171,7 @@ def test(question):
     elif question == "9":
         q9()
     elif question == "10":
-        print("")
+        q10()
     elif question == "11":
         q11()
 
