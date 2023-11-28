@@ -484,6 +484,7 @@ class Graph:
         list_iterations_vertex_mean_alea = []
         iteration_number_glouton = np.zeros(Nmax - 3)
         iteration_number_alea = np.zeros(Nmax - 3)
+
         for n in range(4, Nmax + 1):
             
             for _ in range(num_graphs_per_size):
@@ -567,11 +568,11 @@ class Graph:
         plt.legend()
         plt.show()
 
-
-    def analyze_vertex_iteration_nb_different_nb_g(num_graphs_per_size, Nmax, p, nb_g, weight_interval):
+ 
+    def analyze_vertex_iteration_nb_with_graphs(graphs, num_graphs_per_size, Nmax, p, nb_g, weight_interval):
         """
         Fonction qui trace un graphe avec en abscisse le nombre d'iterations
-        et en ordonne le nombre des sommets pour une liste des graphes de test
+        et en ordonne le nombre des sommets pour un nombre fixe des graphes de test
         """
         bool = True
 
@@ -582,91 +583,95 @@ class Graph:
         list_iterations_vertex_mean_alea = []
         iteration_number_glouton = np.zeros(Nmax - 3)
         iteration_number_alea = np.zeros(Nmax - 3)
-
-        for g in nb_g:
-            for n in range(4, Nmax + 1):
-                
-                for _ in range(num_graphs_per_size):
-                    bool = True
-                    while bool:
-                        bool = False
-                        graph = Graph.random_graph_unary_weight(n, p)
+        
+        for n in range(4, Nmax + 1):
+            
+            for _ in range(num_graphs_per_size):
+                bool = True
+                while bool:
+                    bool = False
+                    graph = graphs[n-4]
+                    
+                    list_graph_w = []
+                    list_weights = []
+                    for _ in range (nb_g): # Creation des graphes ponderees
                         
-                        list_graph_w = []
-                        list_weights = []
-                        for _ in range (g): # Creation des graphes ponderees
-                            
-                            while True:
-                                weight = random.randint(1, weight_interval)
-                                if weight not in (list_weights):
-                                    list_graph_w.append(Graph.weighed_graph(graph, weight))
-                                    list_weights.append(weight)
-                                    break
-
                         while True:
                             weight = random.randint(1, weight_interval)
                             if weight not in (list_weights):
-                                graph_test_H = Graph.weighed_graph(graph, weight)
-                                list_graph_w.append(graph_test_H)
+                                print("oioioi")
+                                graph_cpy = copy.deepcopy(graph)
+                                list_graph_w.append(Graph.weighed_graph(graph_cpy, weight))
+                                list_weights.append(weight)
                                 break
 
-                        deg = Graph.can_reach_half(graph)
+                    while True:
+                        weight = random.randint(1, weight_interval)
+                        if weight not in (list_weights):
+                            graph_cpy = copy.deepcopy(graph)
+                            graph_test_H = Graph.weighed_graph(graph_cpy, weight)
+                            list_graph_w.append(graph_test_H)
+                            break
 
-                        if deg == None:
-                            bool = True #recommencer
-                            continue
-                            
-                        list_path = []
+                    deg = Graph.can_reach_half(graph)
 
-                        list_graph_G = copy.deepcopy(list_graph_w)
-                        list_graph_G.pop(len(list_graph_G) - 1)
-
-                        for current_graph in list_graph_G:
-                            bg, arbre, iter = Graph.bellmanFord(current_graph, deg)
-                            if bg == 0 and arbre == 0 and iter == 0: # cycle negatif
-                                bool = True #recommencer
-                                break
-                            list_path.append(arbre)
-
-                        if bool:
-                            continue
-
-
-                        T = Graph.union_path(list_path)
-
-                        graph_T = Graph.from_tree_to_graph(T)
+                    if deg == None:
+                        bool = True #recommencer
+                        continue
                         
-                        glouton_T = Graph.glouton_fas(graph_T)
+                    list_path = []
 
-                        _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, glouton_T)
+                    list_graph_G = copy.deepcopy(list_graph_w)
+                    list_graph_G.pop(len(list_graph_G) - 1)
 
-                        ordre_aleatoire = Graph.random_order(list_graph_w[len(list_graph_w) - 1])
+                    for current_graph in list_graph_G:
+                        bg, arbre, iter = Graph.bellmanFord(current_graph, deg)
+                        if bg == 0 and arbre == 0 and iter == 0: # cycle negatif
+                            bool = True #recommencer
+                            break
+                        list_path.append(arbre)
 
-                        _, _, iter_alea = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, ordre_aleatoire)
+                    if bool:
+                        print("lalalala")
+                        continue
 
 
-                        iteration_number_glouton[n-4] = iteration_number_glouton[n-4] + iter_glouton
-                        iteration_number_alea[n-4] = iteration_number_alea[n-4] + iter_alea
+                    T = Graph.union_path(list_path)
 
-                        print("iter gl : ",iter_glouton)
-                        print("ite number gl :",iteration_number_glouton)
-                        print("iter alea : ",iter_alea)
-                        print("iteration_number_alea : ", iteration_number_alea)
+                    graph_T = Graph.from_tree_to_graph(T)
+                    
+                    glouton_T = Graph.glouton_fas(graph_T)
 
-                
-                list_iterations_vertex_mean_glouton = iteration_number_glouton / num_graphs_per_size
-                list_iterations_vertex_mean_alea = iteration_number_alea / num_graphs_per_size
-                print("ite number gl apres boucle :",iteration_number_glouton)
+                    _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, glouton_T)
 
-            # Tracé du temps d'exécution en fonction de la taille du graphe (n)
-            plt.plot(range(4, Nmax + 1), list_iterations_vertex_mean_alea, marker='o', label='Aléatoire')
-            plt.plot(range(4, Nmax + 1), list_iterations_vertex_mean_glouton, marker='o', label='Glouton')
-            plt.xlabel("Nombre de sommets du graphe (n)")
-            plt.ylabel("Nombre moyen d'itérations")
-            plt.title("Nombre moyen d'itérations de Bellman-Ford en fonction du nombre de sommets")
-            plt.legend()
+                    ordre_aleatoire = Graph.random_order(list_graph_w[len(list_graph_w) - 1])
 
+                    _, _, iter_alea = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, ordre_aleatoire)
+
+
+                    iteration_number_glouton[n-4] = iteration_number_glouton[n-4] + iter_glouton
+                    iteration_number_alea[n-4] = iteration_number_alea[n-4] + iter_alea
+
+                    print("iter gl : ",iter_glouton)
+                    print("ite number gl :",iteration_number_glouton)
+                    print("iter alea : ",iter_alea)
+                    print("iteration_number_alea : ", iteration_number_alea)
+
+            
+            list_iterations_vertex_mean_glouton = iteration_number_glouton / num_graphs_per_size
+            list_iterations_vertex_mean_alea = iteration_number_alea / num_graphs_per_size
+            print("ite number gl apres boucle :",iteration_number_glouton)
+
+        # Tracé du temps d'exécution en fonction de la taille du graphe (n)
+        plt.plot(range(4, Nmax + 1), list_iterations_vertex_mean_alea, marker='o', label='Aléatoire')
+        plt.plot(range(4, Nmax + 1), list_iterations_vertex_mean_glouton, marker='o', label='Glouton')
+        plt.xlabel("Nombre de sommets du graphe (n)")
+        plt.ylabel("Nombre moyen d'itérations")
+        plt.title("Nombre moyen d'itérations de Bellman-Ford en fonction du nombre de sommets")
+        plt.legend()
         plt.show()
+
+        
 
 
     def create_graph_by_level(nb_v, nb_level, weight_interval):
