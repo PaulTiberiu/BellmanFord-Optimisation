@@ -145,8 +145,14 @@ def test(question):
         Graph.Graph.analyze_vertex_iteration_nb(3, 10, 0.3, 2, 10)
 
     def q10():
-        #Graph.Graph.analyze_vertex_iteration_nb_different_nb_g(3, 10, 0.3, [2, 6], 10)
-        print("")
+        graphs = []
+
+        for i in range(4, 11):
+            graphs.append(Graph.Graph.random_graph_unary_weight(i, 0.3))
+
+        Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 5, 10, 0.3, 2, 10)
+        Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 5, 10, 0.3, 5, 10)
+        
     
     def q11():
         g = Graph.Graph.create_graph_by_level(4, 5, 10)
