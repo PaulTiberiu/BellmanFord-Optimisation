@@ -142,20 +142,14 @@ def test(question):
         print(f"Bellman-Ford sur graph H avec ordre aleatoire :\nAlgorithme en partant de {deg}: {bg}\nArbre des plus courts chemins en partant de {deg}: {arbre}\nNombre d'iterations: {iter}\n")
 
     def q9():
-        Graph.Graph.analyze_vertex_iteration_nb(3, 10, 0.3, 2, 10)
+        Graph.Graph.analyze_vertex_iteration_nb(3, 10, 0.3, 3, 10)
 
     def q10():
-        graphs = []
-
-        for i in range(4, 11):
-            graphs.append(Graph.Graph.random_graph_unary_weight(i, 0.3))
-
-        Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 5, 10, 0.3, 2, 10)
-        Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 5, 10, 0.3, 5, 10)
-        
+        graphs = Graph.Graph.analyze_vertex_iteration_nb(3, 10, 0.3, 2, 10)
+        Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs,3, 10, 0.3, 6, 10)
     
     def q11():
-        g = Graph.Graph.create_graph_by_level(4, 5, 10)
+        g = Graph.Graph.create_graph_by_level(4, 2500, 10)
         Graph.Graph.pretraitement_methode(g, 3, 10)
 
     if question == "1":

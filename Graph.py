@@ -476,6 +476,7 @@ class Graph:
         et en ordonne le nombre des sommets pour un nombre fixe des graphes de test
         """
         bool = True
+        graphs = [[] for i in range(Nmax-3)]
 
         if (Nmax <= 3):
             raise ValueError("Le parametre Nmax doit etre superieur a 3 pour avoir des tests pertinents")
@@ -529,6 +530,10 @@ class Graph:
                             break
                         list_path.append(arbre)
 
+                    bg, arbre, iter = Graph.bellmanFord(list_graph_w[len(list_graph_w) - 1], deg)       # Il faut aussi verifier que H n'a pas de circuit negatif
+                    if bg == 0 and arbre == 0 and iter == 0:
+                        bool = True
+
                     if bool:
                         continue
 
@@ -553,6 +558,7 @@ class Graph:
                     print("ite number gl :",iteration_number_glouton)
                     print("iter alea : ",iter_alea)
                     print("iteration_number_alea : ", iteration_number_alea)
+                    graphs[n-4].append(graph) 
 
             
             list_iterations_vertex_mean_glouton = iteration_number_glouton / num_graphs_per_size
@@ -567,7 +573,7 @@ class Graph:
         plt.title("Nombre moyen d'itérations de Bellman-Ford en fonction du nombre de sommets")
         plt.legend()
         plt.show()
-
+        return graphs
  
     def analyze_vertex_iteration_nb_with_graphs(graphs, num_graphs_per_size, Nmax, p, nb_g, weight_interval):
         """
@@ -583,14 +589,14 @@ class Graph:
         list_iterations_vertex_mean_alea = []
         iteration_number_glouton = np.zeros(Nmax - 3)
         iteration_number_alea = np.zeros(Nmax - 3)
-        
+
         for n in range(4, Nmax + 1):
-            
-            for _ in range(num_graphs_per_size):
+            for i in range(num_graphs_per_size):
                 bool = True
                 while bool:
                     bool = False
-                    graph = graphs[n-4]
+
+                    graph = graphs[n-4][i]
                     
                     list_graph_w = []
                     list_weights = []
@@ -599,17 +605,14 @@ class Graph:
                         while True:
                             weight = random.randint(1, weight_interval)
                             if weight not in (list_weights):
-                                print("oioioi")
-                                graph_cpy = copy.deepcopy(graph)
-                                list_graph_w.append(Graph.weighed_graph(graph_cpy, weight))
+                                list_graph_w.append(Graph.weighed_graph(graph, weight))
                                 list_weights.append(weight)
                                 break
 
                     while True:
                         weight = random.randint(1, weight_interval)
                         if weight not in (list_weights):
-                            graph_cpy = copy.deepcopy(graph)
-                            graph_test_H = Graph.weighed_graph(graph_cpy, weight)
+                            graph_test_H = Graph.weighed_graph(graph, weight)
                             list_graph_w.append(graph_test_H)
                             break
 
@@ -631,10 +634,14 @@ class Graph:
                             break
                         list_path.append(arbre)
 
+                    bg, arbre, iter = Graph.bellmanFord(list_graph_w[len(list_graph_w) - 1], deg)       # Il faut aussi verifier que H n'a pas de circuit negatif
+                    if bg == 0 and arbre == 0 and iter == 0:
+                        bool = True
+
                     if bool:
-                        print("lalalala")
                         continue
 
+                    # print("graph ",n-4, i ,"\n Arcs = ",graph.E)
 
                     T = Graph.union_path(list_path)
 
@@ -669,7 +676,7 @@ class Graph:
         plt.ylabel("Nombre moyen d'itérations")
         plt.title("Nombre moyen d'itérations de Bellman-Ford en fonction du nombre de sommets")
         plt.legend()
-        plt.show()
+        plt.show()        
 
         
 
@@ -750,6 +757,10 @@ class Graph:
                     bool = True #recommencer
                     break
                 list_path.append(arbre)
+
+            bg, arbre, iter = Graph.bellmanFord(list_graph_w[len(list_graph_w) - 1], deg)       # Il faut aussi verifier que H n'a pas de circuit negatif
+            if bg == 0 and arbre == 0 and iter == 0:
+                bool = True
 
             if bool:
                 continue
