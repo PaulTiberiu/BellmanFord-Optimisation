@@ -2,6 +2,8 @@ import Graph
 import copy
 import sys
 
+sys.setrecursionlimit(5000)
+
 def test(question):
     print("---START---\n")
 
@@ -145,8 +147,16 @@ def test(question):
         Graph.Graph.analyze_vertex_iteration_nb(3, 10, 0.3, 3, 10)
 
     def q10():
-        graphs = Graph.Graph.analyze_vertex_iteration_nb(3, 10, 0.3, 2, 10)
-        Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs,3, 10, 0.3, 6, 10)
+        """
+        graphs = Graph.Graph.analyze_vertex_iteration_nb(1, 12, 0.3, 1, 15)
+        Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 1, 12, 1, 15)
+        Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 1, 12, 4, 15)
+        Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 1, 12, 6, 15)
+        """
+        Graph.Graph.analyze_vertex_iteration_nb(3, 12, 0.3, 1, 10)
+        Graph.Graph.analyze_vertex_iteration_nb(1, 12, 0.3, 3, 10)
+        Graph.Graph.analyze_vertex_iteration_nb(1, 12, 0.3, 5, 10)
+        Graph.Graph.analyze_vertex_iteration_nb(1, 12, 0.3, 7, 10)
     
     def q11():
         g = Graph.Graph.create_graph_by_level(4, 2500, 10)

@@ -746,13 +746,17 @@ class Graph:
                 bool = True #recommencer
                 continue
                 
+            print("je suis la")
+
             list_path = []
 
             list_graph_G = copy.deepcopy(list_graph_w)
             list_graph_G.pop(len(list_graph_G) - 1)
 
             for current_graph in list_graph_G:
+                print("ici")
                 bg, arbre, iter = Graph.bellmanFord(current_graph, deg)
+                print("j'ai fait bg")
                 if bg == 0 and arbre == 0 and iter == 0: # cycle negatif
                     bool = True #recommencer
                     break
@@ -765,12 +769,16 @@ class Graph:
             if bool:
                 continue
 
-
+            print("je compile le resultat")
             T = Graph.union_path(list_path)
 
+            print("j'ai fait union")
             graph_T = Graph.from_tree_to_graph(T)
             
+            print("j'ai fait tree to graph")
             glouton_T = Graph.glouton_fas(graph_T)
+
+            print("j'ai fait gloutonfas")
 
             _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, glouton_T)
 
