@@ -746,7 +746,7 @@ class Graph:
                 bool = True #recommencer
                 continue
                 
-            print("je suis la")
+            print("nous avons trouve un sommet qui peut acceder au moins |V|/2 autres sommets")
 
             list_path = []
 
@@ -754,9 +754,8 @@ class Graph:
             list_graph_G.pop(len(list_graph_G) - 1)
 
             for current_graph in list_graph_G:
-                print("ici")
                 bg, arbre, iter = Graph.bellmanFord(current_graph, deg)
-                print("j'ai fait bg")
+                print("nous avons execute bellmanford pour tester s'il y a des cycles negatifs dans les graphes d'apprentissage G")
                 if bg == 0 and arbre == 0 and iter == 0: # cycle negatif
                     bool = True #recommencer
                     break
@@ -772,13 +771,13 @@ class Graph:
             print("je compile le resultat")
             T = Graph.union_path(list_path)
 
-            print("j'ai fait union")
+            print("nous avons pu faire l'union d'arborescences des plus courts chemins")
             graph_T = Graph.from_tree_to_graph(T)
             
-            print("j'ai fait tree to graph")
+            print("nous avons fait la conversion de l'union en graphe")
             glouton_T = Graph.glouton_fas(graph_T)
 
-            print("j'ai fait gloutonfas")
+            print("nous avons execute gloutonfas")
 
             _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, glouton_T)
 
