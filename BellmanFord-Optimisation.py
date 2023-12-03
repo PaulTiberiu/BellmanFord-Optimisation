@@ -4,7 +4,7 @@ import sys
 
 sys.setrecursionlimit(5000)
 
-def test(question):
+def exec(question):
     print("---START---\n")
 
     def q1():
@@ -149,7 +149,7 @@ def test(question):
     def q10():
         """
         # Analyse avec les memes graphs
-        
+
         graphs = Graph.Graph.analyze_vertex_iteration_nb(1, 12, 0.3, 1, 15)
         Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 1, 12, 1, 15)
         Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 1, 12, 4, 15)
@@ -194,4 +194,4 @@ if __name__ == '__main__':
     if len(sys.argv) != 2 or int(sys.argv[1]) > 11 or int(sys.argv[1]) < 1:
         raise ValueError("Il faut indiquer le numero de la question en argument de la ligne de commande (de 1 à 11)")
 
-    test(sys.argv[1])       # Indiquer le numero de la question en argument de la ligne de commande
+    exec(sys.argv[1])       # Indiquer le numero de la question en argument de la ligne de commande
