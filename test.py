@@ -148,11 +148,16 @@ def test(question):
 
     def q10():
         """
+        # Analyse avec les memes graphs
+        
         graphs = Graph.Graph.analyze_vertex_iteration_nb(1, 12, 0.3, 1, 15)
         Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 1, 12, 1, 15)
         Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 1, 12, 4, 15)
         Graph.Graph.analyze_vertex_iteration_nb_with_graphs(graphs, 1, 12, 6, 15)
         """
+
+        # Analyse avec des graphs aleatoires
+        
         Graph.Graph.analyze_vertex_iteration_nb(3, 12, 0.3, 1, 10)
         Graph.Graph.analyze_vertex_iteration_nb(1, 12, 0.3, 3, 10)
         Graph.Graph.analyze_vertex_iteration_nb(1, 12, 0.3, 5, 10)

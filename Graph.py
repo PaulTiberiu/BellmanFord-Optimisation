@@ -358,24 +358,18 @@ class Graph:
 
         already_in = []
 
-        for _, paths in T.items():
+        for _, paths in T.items():      # On boucle sur les chemins
             for path in paths:
                 if len(path) > 1:
-                    for i in range(len(path) - 1):
-                        v1, v2 = path[i], path[i + 1]
-                        if v1 != None and (v1,v2) not in already_in:
+                    for i in range(len(path) - 1):      # On boucle sur chaque noeud du chemin
+                        v1, v2 = path[i], path[i + 1] 
+                        if v1 != None and (v1,v2) not in already_in:    # Si l'arete n'existe pas deja
                             # Ajout d'une arête entre les sommets successifs dans le chemin avec un poids de 1
                             graph.insert_edge(v1, v2, 1)
                             already_in.append((v1,v2))
 
         return graph
-    
 
-#nb d'iterations qu'il prend, pour chaque sommet, de determiner le plus court chemin => stocker ca dans une liste
-#a faire en fonction de l'algo glouton et l'ordre et a comparer avec belman classique comme premier test
-#a faire une fonction qui va tracer un graphe en fonction du nombre d'iterations pour trouver le plus court chemin (en fonction des sauts(cb de sauts il doit faire))
-#ordre aleatoire test bellman
-#ordre glouton test bellman    a essayer plusieurs fois pour voir si le nb d'iterations differe
 
     def bellmanFord(self, start):
         """
@@ -386,47 +380,45 @@ class Graph:
         predecesseurs = {}
         
         for v in self.V:
-            distances[v] = np.inf # On fixe dv = infini
+            distances[v] = np.inf       # On fixe dv = infini
             predecesseurs[v] = None
         distances[start] = 0
-
-        # iterations = 0
 
         for iteration in range(len(self.V) - 1): # On itere sur tous les sommets
             converged = True
             for y in self.E: # On verifie chaque arc entrant
                 for v, w in self.E[y]:
-                    if distances[y] + w < distances[v]:
+                    if distances[y] + w < distances[v]:     # Est ce qu'on a une distance plus courte ?
                         distances[v] = distances[y] + w
                         predecesseurs[v] = y
-                        converged = False
+                        converged = False       # Si les valeurs changent alors on a pas encore converge (a l'inverse si les valeurs ne change pas alors pas besoin d'iterer jusqu'au bout)
             if converged:
                 break
 
         # On verifie qu'il n'y a pas de Cycle negatif
         for y in self.E:
             for v, w in self.E[y]:
-                if distances[v] > distances[y] + w:
+                if distances[v] > distances[y] + w:     # Si apres avoir fini de trouver les plus courts chemins il en existe encore des plus courts cela signifie que le graph possède un cycle negatif
                     # print("Cycle negatif")
                     return 0, 0, 0
 
                 
         paths = {}
-        for p in predecesseurs: # On regarde le chemin pour chaque sommet du graph
+        for p in predecesseurs:     # On regarde le chemin pour chaque sommet du graph
             path = []
             a = p
-            while p != start and p != None: # Tant qu'on arrive pas au sommet de depart
-                path.append(p) # On ajoute le sommet au chemin
-                p = predecesseurs[p] # Puis on passe a son predecesseur
+            while p != start and p != None:     # Tant qu'on arrive pas au sommet de depart
+                path.append(p)                  # On ajoute le sommet au chemin
+                p = predecesseurs[p]            # Puis on passe a son predecesseur
             path.append(p)
-            paths[a] = path[::-1] # On retourne la liste
+            paths[a] = path[::-1]               # On retourne la liste
 
         return distances, paths, iteration+1
     
 
     def bellmanFord_gloutonFas(self, start, ordre):
         """
-        Retourne les distances et les chemins des plus court chemins de start vers les sommets du graph
+        Retourne les distances et les chemins des plus court chemins de start vers les sommets du graph avec un ordre donné
         """
 
         distances = {}
@@ -440,20 +432,20 @@ class Graph:
         for iteration in range(len(self.V) - 1): # On itere sur tous les sommets
             converged = True
             for y in ordre:
-                if y in self.E: # On verifie chaque arcs entrants
+                if y in self.E:         # On verifie chaque arcs entrants
                     for v, w in self.E[y]:
-                        if distances[y] + w < distances[v]:
+                        if distances[y] + w < distances[v]:     # Est ce qu'on a une distance plus courte ?
                             distances[v] = distances[y] + w
                             predecesseurs[v] = y
-                            converged = False
+                            converged = False                   # Si les valeurs changent alors on a pas encore converge (a l'inverse si les valeurs ne change pas alors pas besoin d'iterer jusqu'au bout)
             if converged:
                 break
 
         # On verifie qu'il n'y a pas de Cycle negatif
         for y in self.E:
             for v, w in self.E[y]:
-                if distances[v] > distances[y] + w:
-                    print("Cycle negatif")
+                if distances[v] > distances[y] + w:     # Si apres avoir fini de trouver les plus courts chemins il en existe encore des plus courts cela signifie que le graph possède un cycle negatif
+                    print("Cycle negatif")  
                     return 0, 0, 0
 
                 
@@ -472,11 +464,11 @@ class Graph:
 
     def analyze_vertex_iteration_nb(num_graphs_per_size, Nmax, p, nb_g, weight_interval):
         """
-        Fonction qui trace un graphe avec en abscisse le nombre d'iterations
-        et en ordonne le nombre des sommets pour un nombre fixe des graphes de test
+        Fonction qui trace un graphe avec en abscisse le nombre d'iterations et en ordonne le nombre des sommets pour un nombre donne des graphes de test
         """
+
         bool = True
-        graphs = [[] for i in range(Nmax-3)]
+        graphs = [[] for _ in range(Nmax-3)]        # Nmax - 3 car on commence avec n in range(4, Nmax+1) pour avoir des graohs avec des sommets qui commencent a 4 (pas tres interessant en dessous)
 
         if (Nmax <= 3):
             raise ValueError("Le parametre Nmax doit etre superieur a 3 pour avoir des tests pertinents")
@@ -486,25 +478,26 @@ class Graph:
         iteration_number_glouton = np.zeros(Nmax - 3)
         iteration_number_alea = np.zeros(Nmax - 3)
 
-        for n in range(4, Nmax + 1):
+        for n in range(4, Nmax + 1):        # On itere sur les nombres de noeuds des graphes en partant de 4
             
-            for _ in range(num_graphs_per_size):
+            for _ in range(num_graphs_per_size):    # On itere sur le nombre de graphs de taille n que l'on aura pour faire une moyenne des iterations sur ces differents graphes
                 bool = True
-                while bool:
+                while bool:         # Si bool passe a False ca signifie que l'on a trouver un noeud qui atteint |V|/2 et un bon graph de base avec des bons graphs d'entrainement G un bon graph de test H (qu'ils n'ont pas de cycle negatif)
                     bool = False
                     graph = Graph.random_graph_unary_weight(n, p)
                     
-                    list_graph_w = []
-                    list_weights = []
-                    for _ in range (nb_g): # Creation des graphes ponderees
+                    list_graph_w = []   # On remet les listes de G a zero
+                    list_weights = []   # On remet les listes de poids a zero
+                    for _ in range (nb_g): # Creation des nb_g graphes ponderees G
                         
-                        while True:
-                            weight = random.randint(1, weight_interval)
-                            if weight not in (list_weights):
+                        while True:     # Tant qu'on a pas break ca signifie qu'on a pris un poids weight deja utilise dans un autre graph G (Il est preferable de s'entrainer avec des poids differents sur les graphs G)
+                            weight = random.randint(1, weight_interval)     # On choisi un poids aleatoire entre [1,weight_interval[
+                            if weight not in (list_weights):                # Est ce que ce poids a deja ete utilise pour un autre G ?
                                 list_graph_w.append(Graph.weighed_graph(graph, weight))
                                 list_weights.append(weight)
                                 break
 
+                    # Puis plus qu'a faire le graph de test H
                     while True:
                         weight = random.randint(1, weight_interval)
                         if weight not in (list_weights):
@@ -512,58 +505,60 @@ class Graph:
                             list_graph_w.append(graph_test_H)
                             break
 
-                    deg = Graph.can_reach_half(graph)
+                    deg = Graph.can_reach_half(graph)       # On essaie de trouver un noeud qui peut atteindre |V| / 2
 
-                    if deg == None:
-                        bool = True #recommencer
-                        continue
+                    if deg == None:     # Si deg est egal a None alors cela signifie qu'il n'y a pas de noeud qui peut atteindre |V| / 2
+                        bool = True     # Donc nous devons recommencer 
+                        continue        # On retourne a la boucle while avec bool = True
                         
-                    list_path = []
+                    list_path = []      # On remet la list des chemins a zero
 
                     list_graph_G = copy.deepcopy(list_graph_w)
-                    list_graph_G.pop(len(list_graph_G) - 1)
+                    list_graph_G.pop(len(list_graph_G) - 1)         # Ici on copie la liste des graphs G et H puis on retire H pour creer leur arbre
 
                     for current_graph in list_graph_G:
                         bg, arbre, iter = Graph.bellmanFord(current_graph, deg)
-                        if bg == 0 and arbre == 0 and iter == 0: # cycle negatif
-                            bool = True #recommencer
+                        if bg == 0 and arbre == 0 and iter == 0: # Cycle negatif
+                            bool = True # Recommencer
                             break
-                        list_path.append(arbre)
+                        list_path.append(arbre)     # On ajoute les arbres des graphs G
 
                     bg, arbre, iter = Graph.bellmanFord(list_graph_w[len(list_graph_w) - 1], deg)       # Il faut aussi verifier que H n'a pas de circuit negatif
                     if bg == 0 and arbre == 0 and iter == 0:
                         bool = True
 
-                    if bool:
+                    if bool:    
                         continue
 
+                    # Si on a passer ces etapes il ne nous reste plus qu'a utiliser nos algorithmes pour comparer les differences d'iterations avec un ordre donne ou un ordre aleatoire
 
-                    T = Graph.union_path(list_path)
+                    T = Graph.union_path(list_path)     # On fait l'union des plus courts chemins / arbres des G 
 
-                    graph_T = Graph.from_tree_to_graph(T)
+                    graph_T = Graph.from_tree_to_graph(T)       # On doit transformer cette union en un graph pour le donner a GloutonFas
                     
-                    glouton_T = Graph.glouton_fas(graph_T)
+                    glouton_T = Graph.glouton_fas(graph_T)      # On trouve un ordre grace a GloutonFas
 
-                    _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, glouton_T)
+                    _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, glouton_T)      # On fait Bellman-Ford avec l'ordre donne par GloutonFas
 
-                    ordre_aleatoire = Graph.random_order(list_graph_w[len(list_graph_w) - 1])
+                    ordre_aleatoire = Graph.random_order(list_graph_w[len(list_graph_w) - 1])       # On prend un ordre aleatoire
 
-                    _, _, iter_alea = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, ordre_aleatoire)
+                    _, _, iter_alea = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, ordre_aleatoire)       # On fait Bellman-Ford avec l'ordre donne aleatoire
 
 
-                    iteration_number_glouton[n-4] = iteration_number_glouton[n-4] + iter_glouton
+                    iteration_number_glouton[n-4] = iteration_number_glouton[n-4] + iter_glouton         # Ici a chaque fois n-4 par rapport au nombre de noeuds de bases : 4
                     iteration_number_alea[n-4] = iteration_number_alea[n-4] + iter_alea
 
-                    print("iter gl : ",iter_glouton)
-                    print("ite number gl :",iteration_number_glouton)
-                    print("iter alea : ",iter_alea)
-                    print("iteration_number_alea : ", iteration_number_alea)
-                    graphs[n-4].append(graph) 
+                    # print("iter gl : ",iter_glouton)
+                    # print("ite number gl :",iteration_number_glouton)
+                    # print("iter alea : ",iter_alea)
+                    # print("iteration_number_alea : ", iteration_number_alea)
+
+                    graphs[n-4].append(graph)       # On garde en memoire les graphs aleatoires pour potentiellement les donnes a l'algorithme jumeau analyze_vertex_iteration_nb_with_graphs() pour qu'il existe ce meme algo mais avec des graphs predefinis
 
             
             list_iterations_vertex_mean_glouton = iteration_number_glouton / num_graphs_per_size
             list_iterations_vertex_mean_alea = iteration_number_alea / num_graphs_per_size
-            print("ite number gl apres boucle :",iteration_number_glouton)
+            # print("ite number gl apres boucle :",iteration_number_glouton)
 
         # Tracé du temps d'exécution en fonction de la taille du graphe (n)
         plt.plot(range(4, Nmax + 1), list_iterations_vertex_mean_alea, marker='o', label='Aléatoire')
@@ -573,12 +568,12 @@ class Graph:
         plt.title("Nombre moyen d'itérations de Bellman-Ford en fonction du nombre de sommets")
         plt.legend()
         plt.show()
+
         return graphs
  
     def analyze_vertex_iteration_nb_with_graphs(graphs, num_graphs_per_size, Nmax, p, nb_g, weight_interval):
         """
-        Fonction qui trace un graphe avec en abscisse le nombre d'iterations
-        et en ordonne le nombre des sommets pour un nombre fixe des graphes de test
+        Fonction qui trace un graphe avec en abscisse le nombre d'iterations et en ordonne le nombre des sommets pour un nombre donne des graphes de test avec des graphs donnes
         """
         bool = True
 
@@ -659,15 +654,9 @@ class Graph:
                     iteration_number_glouton[n-4] = iteration_number_glouton[n-4] + iter_glouton
                     iteration_number_alea[n-4] = iteration_number_alea[n-4] + iter_alea
 
-                    print("iter gl : ",iter_glouton)
-                    print("ite number gl :",iteration_number_glouton)
-                    print("iter alea : ",iter_alea)
-                    print("iteration_number_alea : ", iteration_number_alea)
-
             
             list_iterations_vertex_mean_glouton = iteration_number_glouton / num_graphs_per_size
             list_iterations_vertex_mean_alea = iteration_number_alea / num_graphs_per_size
-            print("ite number gl apres boucle :",iteration_number_glouton)
 
         # Tracé du temps d'exécution en fonction de la taille du graphe (n)
         plt.plot(range(4, Nmax + 1), list_iterations_vertex_mean_alea, marker='o', label='Aléatoire')
@@ -678,61 +667,66 @@ class Graph:
         plt.legend()
         plt.show()        
 
-        
+        return
 
 
     def create_graph_by_level(nb_v, nb_level, weight_interval):
+        """
+        Fonction qui creer un graph par niveau avec nb_v le nombre de noeuds par niveau. Chaque noeuds du niveau j sont liees a chaque noeuds du niveau j+1
+        """
         V = []
         E = {}
 
         num_v = 0
 
-        for i in range(nb_level):
-            for _ in range(nb_v):
+        for i in range(nb_level):       # On itere sur les niveaux
+            for _ in range(nb_v):       # On creer nb_v noeuds
                 V.append(num_v)
                 num_v += 1
 
             if i != 0:
-                for j in range(num_v-2*nb_v, num_v-nb_v):          # niveau j
-                    for k in range(num_v-nb_v, num_v):      # niveau j+1
+                for j in range(num_v-2*nb_v, num_v-nb_v):          # Niveau j
+                    for k in range(num_v-nb_v, num_v):             # Niveau j+1
                         weight = random.randint(-weight_interval, weight_interval)
-                        while weight == 0:
+                        while weight == 0:          
                             weight = random.randint(-weight_interval, weight_interval)
                         if j not in E:
-                            E[j] = set()
+                            E[j] = set()        # On mets aretes vide a chaque noeud
                         E[j].add((k,weight))
         
-        for i in range(num_v-nb_v, num_v):
+        for i in range(num_v-nb_v, num_v):      # Les nb_v du dernier niveau n'a pas d'aretes il ne faut pas oublier de les mettres a vide
             E[i] = set()
 
         graph = Graph(V, E)
+
         return graph
     
     def pretraitement_methode(self, nb_g, weight_interval):
         """
         Fonction qui trace un graphe avec en abscisse le nombre d'iterations
         et en ordonne le nombre des sommets pour un nombre fixe des graphes de test
-        """        
+        """
         bool = True
 
         if (len(self.V) <= 3):
             raise ValueError("Le parametre Nmax doit etre superieur a 3 pour avoir des tests pertinents")
         
         bool = True
-        while bool:
+        while bool:         # Si bool passe a False ca signifie que l'on a trouver un noeud qui atteint |V|/2 et un bon graph de base avec des bons graphs d'entrainement G un bon graph de test H (qu'ils n'ont pas de cycle negatif)
             bool = False
             
-            list_graph_w = []
-            list_weights = []
-            for _ in range (nb_g+1): # Creation des graphes ponderees
-                
-                while True:
-                    weight = random.randint(1, weight_interval)
-                    if weight not in (list_weights):
+            list_graph_w = []       # On remet les listes de G a zero
+            list_weights = []       # On remet les listes des poids a zero
+            for _ in range (nb_g):      # Creation des graphes ponderees$
+                                
+                while True:         # Tant qu'on a pas break ca signifie qu'on a pris un poids weight deja utilise dans un autre graph G (Il est preferable de s'entrainer avec des poids differents sur les graphs G)
+                    weight = random.randint(1, weight_interval)         # On choisi un poids aleatoire entre [1,weight_interval[
+                    if weight not in (list_weights):                    # Est ce que ce poids a deja ete utilise pour un autre G ?
                         list_graph_w.append(Graph.weighed_graph(self, weight))
                         list_weights.append(weight)
                         break
 
+            # Puis plus qu'a faire le graph de test H
             while True:
                 weight = random.randint(1, weight_interval)
                 if weight not in (list_weights):
@@ -740,24 +734,24 @@ class Graph:
                     list_graph_w.append(graph_test_H)
                     break
 
-            deg = Graph.can_reach_half(self)
+            deg = Graph.can_reach_half(self)        # On essaie de trouver un noeud qui peut atteindre |V| / 2
 
-            if deg == None:
-                bool = True #recommencer
-                continue
-                
-            print("nous avons trouve un sommet qui peut acceder au moins |V|/2 autres sommets")
+            if deg == None:     # Si deg est egal a None alors cela signifie qu'il n'y a pas de noeud qui peut atteindre |V| / 2
+                bool = True     # Donc nous devons recommencer 
+                continue        # On retourne a la boucle while avec bool = True
 
-            list_path = []
+            print("Nous avons trouve un sommet qui peut acceder au moins |V|/2 autres sommets")
+                        
+            list_path = []      # On remet la list des chemins a zero
 
             list_graph_G = copy.deepcopy(list_graph_w)
-            list_graph_G.pop(len(list_graph_G) - 1)
+            list_graph_G.pop(len(list_graph_G) - 1)         # Ici on copie la liste des graphs G et H puis on retire H pour creer leur arbre
 
             for current_graph in list_graph_G:
                 bg, arbre, iter = Graph.bellmanFord(current_graph, deg)
-                print("nous avons execute bellmanford pour tester s'il y a des cycles negatifs dans les graphes d'apprentissage G")
-                if bg == 0 and arbre == 0 and iter == 0: # cycle negatif
-                    bool = True #recommencer
+                print("Nous avons execute bellmanford pour tester s'il y a des cycles negatifs dans les graphes d'apprentissage G")
+                if bg == 0 and arbre == 0 and iter == 0:    # Cycle negatif
+                    bool = True     # Recommencer
                     break
                 list_path.append(arbre)
 
@@ -768,21 +762,23 @@ class Graph:
             if bool:
                 continue
 
-            print("je compile le resultat")
-            T = Graph.union_path(list_path)
+            # Si on a passer ces etapes il ne nous reste plus qu'a utiliser nos algorithmes pour comparer les differences d'iterations avec un ordre donne ou un ordre aleatoire
 
-            print("nous avons pu faire l'union d'arborescences des plus courts chemins")
-            graph_T = Graph.from_tree_to_graph(T)
+            print("Nous compilons le resultat")
+            T = Graph.union_path(list_path)     # On fait l'union des plus courts chemins / arbres des G 
+
+            print("Nous avons pu faire l'union d'arborescences des plus courts chemins")
+            graph_T = Graph.from_tree_to_graph(T)       # On doit transformer cette union en un graph pour le donner a GloutonFas
             
-            print("nous avons fait la conversion de l'union en graphe")
-            glouton_T = Graph.glouton_fas(graph_T)
+            print("Nous avons fait la conversion de l'union en graphe")
+            glouton_T = Graph.glouton_fas(graph_T)      # On trouve un ordre grace a GloutonFas
 
-            print("nous avons execute gloutonfas")
+            _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, glouton_T)      # On fait Bellman-Ford avec l'ordre donne par GloutonFas
 
-            _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, glouton_T)
+            ordre_aleatoire = Graph.random_order(list_graph_w[len(list_graph_w) - 1])       # On prend un ordre aleatoire
 
-            ordre_aleatoire = Graph.random_order(list_graph_w[len(list_graph_w) - 1])
-
-            _, _, iter_alea = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, ordre_aleatoire)
+            _, _, iter_alea = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, ordre_aleatoire)       # On fait Bellman-Ford avec l'ordre donne aleatoire
 
             print("Iterations avec ordre donne par GloutonFas: ", iter_glouton, "\nIterations avec ordre aleatoire: ", iter_alea)
+
+            return
