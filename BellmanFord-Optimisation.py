@@ -166,6 +166,7 @@ def exec(question):
     def q11():
         g = Graph.Graph.create_graph_by_level(4, 2500, 10)
         Graph.Graph.pretraitement_methode(g, 3, 10)
+        Graph.Graph.pretraitement_methode_graph(3, 10, 70, 4, 15)
 
     if question == "1":
         q1()
