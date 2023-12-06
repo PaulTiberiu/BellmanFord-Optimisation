@@ -703,8 +703,8 @@ class Graph:
     
     def pretraitement_methode(self, nb_g, weight_interval):
         """
-        Fonction qui trace un graphe avec en abscisse le nombre d'iterations
-        et en ordonne le nombre des sommets pour un nombre fixe des graphes de test
+        Fonction qui calcule le nombre d'iterations d'un graphe par niveau
+        en generant nb_g graphes d'entrainement avec de poids differents
         """
         bool = True
 
@@ -712,12 +712,12 @@ class Graph:
             raise ValueError("Le parametre Nmax doit etre superieur a 3 pour avoir des tests pertinents")
         
         bool = True
-        while bool:         # Si bool passe a False ca signifie que l'on a trouver un noeud qui atteint |V|/2 et un bon graph de base avec des bons graphs d'entrainement G un bon graph de test H (qu'ils n'ont pas de cycle negatif)
+        while bool:         # Si bool passe a False ca signifie que l'on a trouve un noeud qui atteint |V|/2 et un bon graph de base avec des bons graphs d'entrainement G un bon graph de test H (qu'ils n'ont pas de cycle negatif)
             bool = False
             
             list_graph_w = []       # On remet les listes de G a zero
             list_weights = []       # On remet les listes des poids a zero
-            for _ in range (nb_g):      # Creation des graphes ponderees$
+            for _ in range (nb_g):      # Creation des graphes ponderees
                                 
                 while True:         # Tant qu'on a pas break ca signifie qu'on a pris un poids weight deja utilise dans un autre graph G (Il est preferable de s'entrainer avec des poids differents sur les graphs G)
                     weight = random.randint(1, weight_interval)         # On choisi un poids aleatoire entre [1,weight_interval[
@@ -739,6 +739,8 @@ class Graph:
             if deg == None:     # Si deg est egal a None alors cela signifie qu'il n'y a pas de noeud qui peut atteindre |V| / 2
                 bool = True     # Donc nous devons recommencer 
                 continue        # On retourne a la boucle while avec bool = True
+            
+            print("deg : ", deg)
 
             print("Nous avons trouve un sommet qui peut acceder au moins |V|/2 autres sommets")
                         
@@ -747,17 +749,11 @@ class Graph:
             list_graph_G = copy.deepcopy(list_graph_w)
             list_graph_G.pop(len(list_graph_G) - 1)         # Ici on copie la liste des graphs G et H puis on retire H pour creer leur arbre
 
+            
+            # Pas besoin de verifier s'il y a de cycle negatif dans ce cas
             for current_graph in list_graph_G:
                 bg, arbre, iter = Graph.bellmanFord(current_graph, deg)
-                print("Nous avons execute bellmanford pour tester s'il y a des cycles negatifs dans les graphes d'apprentissage G")
-                if bg == 0 and arbre == 0 and iter == 0:    # Cycle negatif
-                    bool = True     # Recommencer
-                    break
                 list_path.append(arbre)
-
-            bg, arbre, iter = Graph.bellmanFord(list_graph_w[len(list_graph_w) - 1], deg)       # Il faut aussi verifier que H n'a pas de circuit negatif
-            if bg == 0 and arbre == 0 and iter == 0:
-                bool = True
 
             if bool:
                 continue
@@ -772,7 +768,7 @@ class Graph:
             
             print("Nous avons fait la conversion de l'union en graphe")
             glouton_T = Graph.glouton_fas(graph_T)      # On trouve un ordre grace a GloutonFas
-
+            print(glouton_T)
             _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], deg, glouton_T)      # On fait Bellman-Ford avec l'ordre donne par GloutonFas
 
             ordre_aleatoire = Graph.random_order(list_graph_w[len(list_graph_w) - 1])       # On prend un ordre aleatoire
@@ -782,3 +778,90 @@ class Graph:
             print("Iterations avec ordre donne par GloutonFas: ", iter_glouton, "\nIterations avec ordre aleatoire: ", iter_alea)
 
             return
+    
+    def pretraitement_methode_graph(nb_g, weight_interval, levels, vertex_on_level, num_graphs_per_size):
+        """
+        Fonction qui trace un graphe avec en abscisse le nombre d'iterations
+        et en ordonne le nombre de niveaux pour un nombre fixe des graphes_by_level de test
+        """        
+
+        bool = True
+        iteration_number_glouton = np.zeros(levels//5)
+        #iteration_number_alea = np.zeros(levels//5)
+        list_iterations_vertex_mean_glouton = []
+        #list_iterations_vertex_mean_alea = []
+        cpt = 1
+
+        for i in range(5, levels + 1, 5):
+            
+            for j in range(num_graphs_per_size):
+                bool = True
+                g = Graph.create_graph_by_level(vertex_on_level, i, weight_interval)
+
+                while bool:
+                    bool = False
+                    
+                    list_graph_w = []
+                    list_weights = []
+                    for _ in range (nb_g): # Creation des graphes ponderees
+                        
+                        while True:
+                            weight = random.randint(1, weight_interval)
+                            if weight not in (list_weights):
+                                list_graph_w.append(Graph.weighed_graph(g, weight))
+                                list_weights.append(weight)
+                                break
+
+                    while True:
+                        weight = random.randint(1, weight_interval)
+                        if weight not in (list_weights):
+                            graph_test_H = Graph.weighed_graph(g, weight)
+                            list_graph_w.append(graph_test_H)
+                            break
+
+                    list_path = []
+
+                    list_graph_G = copy.deepcopy(list_graph_w)
+                    list_graph_G.pop(len(list_graph_G) - 1)
+
+                    for current_graph in list_graph_G:
+                        bg, arbre, iter = Graph.bellmanFord(current_graph, 0) # on commence a partir du sommet 0, deg > v/2
+                        list_path.append(arbre)
+
+                    #pas besoin de tester un cycle negatif, car il n'y a pas dans ce cas
+
+                    print("je compile le resultat")
+                    T = Graph.union_path(list_path)
+
+                    print("nous avons pu faire l'union d'arborescences des plus courts chemins")
+                    #print(T)
+                    graph_T = Graph.from_tree_to_graph(T)
+                    
+                    print("nous avons fait la conversion de l'union en graphe")
+                    glouton_T = Graph.glouton_fas(graph_T)
+
+                    print("nous avons execute gloutonfas")
+
+                    _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], 0, glouton_T)
+
+                    #ordre_aleatoire = Graph.random_order(list_graph_w[len(list_graph_w) - 1])
+
+                    #_, _, iter_alea = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], 0, ordre_aleatoire)
+
+                    #print("Iterations avec ordre donne par GloutonFas: ", iter_glouton, "\nIterations avec ordre aleatoire: ", iter_alea)
+                    print("Iterations avec ordre donne par GloutonFas: ", iter_glouton)
+                    iteration_number_glouton[i-(5*cpt-(cpt-1))] = iteration_number_glouton[i-(5*cpt-(cpt-1))] + iter_glouton 
+                    print(iteration_number_glouton)
+                    #iteration_number_alea[i-(5*cpt-(cpt-1))] = iteration_number_alea[i-(5*cpt-(cpt-1))] + iter_alea
+            
+            list_iterations_vertex_mean_glouton = iteration_number_glouton / num_graphs_per_size
+            #list_iterations_vertex_mean_alea = iteration_number_alea / num_graphs_per_size
+            cpt += 1
+
+        #plt.plot(range(5, levels + 1, 5), list_iterations_vertex_mean_alea, marker='o', label='Aléatoire')
+        plt.plot(range(5, levels + 1, 5), list_iterations_vertex_mean_glouton, marker='o', label='Glouton')
+        plt.xlabel("Nombre de niveaux")
+        plt.ylabel("Nombre moyen d'itérations")
+        plt.title("Nombre moyen d'itérations de Bellman-Ford en fonction du nombre de niveaux")
+        plt.legend()
+        plt.show()
