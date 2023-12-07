@@ -164,8 +164,8 @@ def exec(question):
         Graph.Graph.analyze_vertex_iteration_nb(1, 12, 0.3, 7, 10)
     
     def q11():
-        g = Graph.Graph.create_graph_by_level(4, 2500, 10)
-        Graph.Graph.pretraitement_methode(g, 3, 10)
+        #g = Graph.Graph.create_graph_by_level(4, 2500, 10)
+        #Graph.Graph.pretraitement_methode(g, 3, 10)
         Graph.Graph.pretraitement_methode_graph(3, 10, 70, 4, 15)
 
     if question == "1":
