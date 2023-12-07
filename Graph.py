@@ -865,3 +865,165 @@ class Graph:
         plt.title("Nombre moyen d'itérations de Bellman-Ford en fonction du nombre de niveaux")
         plt.legend()
         plt.show()
+
+        def pretraitement_methode_graph(nb_g, weight_interval, levels, vertex_on_level, num_graphs_per_size):
+        """
+        Fonction qui trace un graphe avec en abscisse le nombre d'iterations
+        et en ordonne le nombre de niveaux pour un nombre fixe des graphes_by_level de test
+        """        
+
+        bool = True
+        iteration_number_glouton = np.zeros(levels//5)
+        iteration_number_alea = np.zeros(levels//5)
+        list_iterations_vertex_mean_glouton = []
+        list_iterations_vertex_mean_alea = []
+
+        execution_time_glouton = np.zeros(levels//5)
+        execution_time_alea = np.zeros(levels//5)
+        list_time_vertex_mean_glouton = []
+        list_time_vertex_mean_alea = []
+
+        execution_time_treatment = np.zeros(levels//5)
+        list_time_treatment = []
+        cpt = 1
+
+        for i in range(5, levels + 1, 5):
+            
+            for j in range(num_graphs_per_size):
+                bool = True
+                g = Graph.create_graph_by_level(vertex_on_level, i, weight_interval)
+
+                while bool:
+                    bool = False
+                    
+                    list_graph_w = []
+                    list_weights = []
+                    for _ in range (nb_g): # Creation des graphes ponderees
+                        
+                        while True:
+                            weight = random.randint(1, weight_interval)
+                            if weight not in (list_weights):
+                                list_graph_w.append(Graph.weighed_graph(g, weight))
+                                list_weights.append(weight)
+                                break
+
+                    while True:
+                        weight = random.randint(1, weight_interval)
+                        if weight not in (list_weights):
+                            graph_test_H = Graph.weighed_graph(g, weight)
+                            list_graph_w.append(graph_test_H)
+                            break
+
+                    list_path = []
+
+                    list_graph_G = copy.deepcopy(list_graph_w)
+                    list_graph_G.pop(len(list_graph_G) - 1)
+
+                    for current_graph in list_graph_G:
+                        bg, arbre, iter = Graph.bellmanFord(current_graph, 0) # on commence a partir du sommet 0, deg > v/2
+                        list_path.append(arbre)
+
+                    #pas besoin de tester un cycle negatif, car il n'y a pas dans ce cas
+
+                    print("je compile le resultat")
+                    start_treatment = time.time()
+                    T = Graph.union_path(list_path)
+
+                    print("nous avons pu faire l'union d'arborescences des plus courts chemins")
+                    #print(T)
+                    graph_T = Graph.from_tree_to_graph(T)
+                    
+                    print("nous avons fait la conversion de l'union en graphe")
+                    glouton_T = Graph.glouton_fas(graph_T)
+                    end_treatment = time.time()
+
+                    print("nous avons execute gloutonfas")
+
+                    start_gl = time.time()
+                    _, _, iter_glouton = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], 0, glouton_T)
+                    end_gl = time.time()
+
+                    
+                    ordre_aleatoire = Graph.random_order(list_graph_w[len(list_graph_w) - 1])
+                    start_alea = time.time()
+                    _, _, iter_alea = Graph.bellmanFord_gloutonFas(list_graph_w[len(list_graph_w) - 1], 0, ordre_aleatoire)
+                    end_alea = time.time()
+
+                    print("Iterations avec ordre donne par GloutonFas: ", iter_glouton, "\nIterations avec ordre aleatoire: ", iter_alea)
+                    iteration_number_glouton[i-(5*cpt-(cpt-1))] = iteration_number_glouton[i-(5*cpt-(cpt-1))] + iter_glouton 
+                    iteration_number_alea[i-(5*cpt-(cpt-1))] = iteration_number_alea[i-(5*cpt-(cpt-1))] + iter_alea
+
+                    execution_time_glouton[i-(5*cpt-(cpt-1))] = execution_time_glouton[i-(5*cpt-(cpt-1))] + (end_gl - start_gl) 
+                    execution_time_alea[i-(5*cpt-(cpt-1))] = execution_time_alea[i-(5*cpt-(cpt-1))] + (end_alea - start_alea)
+                    
+                    execution_time_treatment[i-(5*cpt-(cpt-1))] = execution_time_treatment[i-(5*cpt-(cpt-1))] + (end_treatment - start_treatment)
+            
+            list_iterations_vertex_mean_glouton = iteration_number_glouton / num_graphs_per_size
+            list_iterations_vertex_mean_alea = iteration_number_alea / num_graphs_per_size
+
+            list_time_vertex_mean_glouton = execution_time_glouton / num_graphs_per_size
+            list_time_vertex_mean_alea = execution_time_alea / num_graphs_per_size
+
+            list_time_treatment = execution_time_treatment / num_graphs_per_size
+            cpt += 1
+
+        x_values = np.array(range(5, levels + 1, 5))
+        y_values = list_iterations_vertex_mean_glouton
+        x_values2 = np.array(range(5, levels + 1, 5))
+        y_values2 = list_iterations_vertex_mean_alea
+        # Fit a linear regression line (y = mx + b)
+        slope, intercept = np.polyfit(x_values, y_values, 1)
+        slope2, intercept2 = np.polyfit(x_values2, y_values2, 1)
+        print('Pente glouton: ', slope)
+        print('Pente alea: ', slope2)
+
+        plt.plot(x_values2, y_values2, marker='o', label='Aléatoire')
+        plt.plot(x_values, y_values, marker='o', label='Glouton')
+        plt.plot(x_values, slope * x_values + intercept, label=f'Fit: y = {slope:.2f}x + {intercept:.2f}', linestyle='--')
+        plt.plot(x_values2, slope2 * x_values2 + intercept2, label=f'Fit: y = {slope2:.2f}x + {intercept2:.2f}', linestyle='--')
+        plt.xlabel("Nombre de niveaux")
+        plt.ylabel("Nombre moyen d'itérations")
+        plt.title("Nombre moyen d'itérations de Bellman-Ford en fonction du nombre de niveaux")
+        plt.legend()
+        plt.show()
+
+        x_values3 = np.array(range(5, levels + 1, 5))
+        y_values3 = list_time_vertex_mean_alea
+        x_values4 = np.array(range(5, levels + 1, 5))
+        y_values4 = list_time_vertex_mean_glouton
+        x_values5 = np.array(range(5, levels + 1, 5))
+        y_values5 = list_time_treatment
+
+        # Fit a linear regression line (y = mx + b)
+        slope3, intercept3 = np.polyfit(x_values3, y_values3, 1)
+        slope4, intercept4 = np.polyfit(x_values4, y_values4, 1)
+
+        plt.plot(x_values3, y_values3, marker='o', label='Aléatoire')
+        plt.plot(x_values4, y_values4, marker='o', label='Glouton')
+        plt.plot(x_values3, slope3 * x_values3 + intercept3, label=f'Fit: y = {slope3:.8f}x + {intercept3:.8f}', linestyle='--')
+        plt.plot(x_values4, slope4 * x_values4 + intercept4, label=f'Fit: y = {slope4:.8f}x + {intercept4:.8f}', linestyle='--')
+        plt.xlabel("Nombre de niveaux")
+        plt.ylabel("Temps moyen d'exécution")
+        plt.title("Temps moyen d'exécution de Bellman-Ford en fonction du nombre de niveaux")
+        plt.legend()
+        plt.show()
+
+        plt.plot(x_values5, y_values5, marker='o', label='Pretraitement')
+        plt.xlabel("Nombre de niveaux")
+        plt.ylabel("Temps moyen d'exécution du pretraitement")
+        plt.legend()
+        plt.show()
+
+        #log log pour voir si polynomial
+        log_sizes = np.log(x_values5)
+        log_times = np.log(y_values5)
+        slope5, intercept5 = np.polyfit(log_sizes, log_times, 1)
+        plt.plot(x_values5, y_values5, marker='o', label='Pretraitement')
+        plt.xscale("log")
+        plt.yscale("log")
+        print(f"Pente de la régression linéaire (log log): {slope5:.2f}")
+
+        plt.xlabel("Nombre de niveaux")
+        plt.ylabel("Temps moyen d'exécution du pretraitement")
+        plt.legend()
+        plt.show()
