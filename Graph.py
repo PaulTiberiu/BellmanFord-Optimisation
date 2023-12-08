@@ -1,4 +1,5 @@
 import copy
+import time
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -866,9 +867,9 @@ class Graph:
         plt.legend()
         plt.show()
 
-        def pretraitement_methode_graph(nb_g, weight_interval, levels, vertex_on_level, num_graphs_per_size):
+    def pretraitement_methode_graph(nb_g, weight_interval, levels, vertex_on_level, num_graphs_per_size):
         """
-        Fonction qui trace un graphe avec en abscisse le nombre d'iterations
+        Fonction qui trace un graphe par niveau avec en abscisse le nombre d'iterations
         et en ordonne le nombre de niveaux pour un nombre fixe des graphes_by_level de test
         """        
 
